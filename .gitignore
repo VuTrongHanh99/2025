@@ -9,7 +9,6 @@ bin/
 obj/
 .vs/
 wwwroot/
-Properties/
 # Compiled Java class files
 *.class
 # Compiled Python bytecode
