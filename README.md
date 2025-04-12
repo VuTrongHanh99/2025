@@ -1,4 +1,5 @@
 "# 2025" 
+Tạo nhánh master và chuyển default về nhánh master
 Cách viết Gitignore Pattern hiệu quả
 ------------------------------------------------------------------
 {**}/
