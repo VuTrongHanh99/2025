@@ -1,0 +1,10 @@
+<div class="window">
+    <div class="window-header">
+        <span>{{ window.appName }}</span>
+        <button (click)="close.emit()">X</button>
+    </div>
+    <div class="window-body">
+        <!-- Nội dung ứng dụng tại đây -->
+        <p>Đây là ứng dụng {{ window.appName }}</p>
+    </div>
+</div>

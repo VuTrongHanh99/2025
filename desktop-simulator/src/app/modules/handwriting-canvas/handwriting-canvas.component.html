@@ -1,0 +1,33 @@
+<div class="toolbar">
+    <label>
+        🎨 Màu bút:
+        <input type="color"
+               [(ngModel)]="penColor" />
+    </label>
+    <label>
+        ✏️ Độ dày:
+        <input type="range"
+               min="1"
+               max="20"
+               [(ngModel)]="penWidth" />
+        <span>{{ penWidth }}px</span>
+    </label>
+</div>
+
+<div class="canvas-wrapper">
+    <canvas #canvas
+            width="800"
+            height="400"></canvas>
+</div>
+
+<div class="actions">
+    <button (click)="clearCanvas()">🧹 Xóa</button>
+    <button (click)="saveCanvas()">💾 Lưu ảnh</button>
+    <button (click)="uploadCanvas()">☁️ Gửi lên server</button>
+    <button (click)="handleRecognize()">🧠 Nhận diện chữ viết tay</button>
+</div>
+<div class="result-box"
+     *ngIf="resultText">
+    <h3>📝 Kết quả nhận diện:</h3>
+    <pre>{{ resultText }}</pre>
+</div>

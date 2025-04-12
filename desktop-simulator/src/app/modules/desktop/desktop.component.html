@@ -1,0 +1,15 @@
+<div class="desktop">
+    <app-taskbar></app-taskbar>
+    <div class="icons">
+        <div class="icon"
+             (dblclick)="openWindow('notepad')">
+            <img src="assets/icons/notepad.png"
+                 alt="Notepad" />
+            <p>Notepad</p>
+        </div>
+        <!-- Thêm các biểu tượng khác tại đây -->
+    </div>
+    <app-window *ngFor="let window of openWindows"
+                [window]="window"
+                (close)="closeWindow(window.id)"></app-window>
+</div>
