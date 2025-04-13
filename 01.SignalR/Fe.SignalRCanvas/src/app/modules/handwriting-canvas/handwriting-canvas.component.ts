@@ -15,6 +15,12 @@ export class HandwritingCanvasComponent implements OnInit, AfterViewInit {
   penWidth: number = 2;
   resultText: string = '#000000';
 
+  text = 'Xin chào!\nAngular Rocks!';
+  fontFamily = 'Arial';
+  fontSize = 30;
+  fontColor = '#0000ff';
+  rotation = 0;
+
   constructor(public ocr: OcrService) { }
 
   ngOnInit(): void {
@@ -22,9 +28,45 @@ export class HandwritingCanvasComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d')!;
-    this.ctx.lineWidth = 2;
-    this.ctx.lineCap = 'round';
+    if (this.ctx) {
+      this.ctx.font = '30px Arial';
+      this.ctx.fillStyle = 'blue';
+      this.ctx.fillText('Xin chào Angular!', 50, 100);
+      this.ctx.lineWidth = 2;
+      this.ctx.lineCap = 'round';
+      this.drawText(); // Vẽ mặc định khi load
+    }
     this.setupEvents(canvas);
+  }
+  drawText(): void {
+    const canvas = this.canvasRef.nativeElement;
+    const ctx = this.ctx;
+
+    // Xóa canvas cũ
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Cài đặt font và màu
+    ctx.fillStyle = this.fontColor;
+    ctx.font = `${this.fontSize}px ${this.fontFamily}`;
+
+    // Lưu trạng thái trước khi xoay
+    ctx.save();
+
+    // Dịch điểm gốc về giữa canvas và xoay
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((this.rotation * Math.PI) / 180);
+
+    // Tính vị trí chữ sau khi xoay (chữ sẽ vẽ bắt đầu từ giữa)
+    const lines = this.text.split('\n');
+    const lineHeight = this.fontSize + 5;
+    const totalHeight = lines.length * lineHeight;
+
+    lines.forEach((line, index) => {
+      ctx.fillText(line, -ctx.measureText(line).width / 2, -totalHeight / 2 + index * lineHeight);
+    });
+
+    // Khôi phục trạng thái ban đầu
+    ctx.restore();
   }
   setupEvents(canvas: HTMLCanvasElement) {
     // Mouse events

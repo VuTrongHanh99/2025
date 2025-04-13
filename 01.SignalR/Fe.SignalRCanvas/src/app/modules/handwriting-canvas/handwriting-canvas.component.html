@@ -13,6 +13,34 @@
         <span>{{ penWidth }}px</span>
     </label>
 </div>
+<div class="controls">
+    <div class="form-group">
+        <label>📝 Văn bản:</label>
+        <textarea [(ngModel)]="text"
+                  rows="4"
+                  cols="40"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>🔤 Font:</label>
+        <input [(ngModel)]="fontFamily"
+               placeholder="VD: Arial" />
+
+        <label>🔠 Kích cỡ:</label>
+        <input type="number"
+               [(ngModel)]="fontSize" />
+
+        <label>🎨 Màu:</label>
+        <input type="color"
+               [(ngModel)]="fontColor" />
+
+        <label>🌀 Góc xoay (độ):</label>
+        <input type="number"
+               [(ngModel)]="rotation" />
+    </div>
+
+    <button (click)="drawText()">✏️ Vẽ chữ</button>
+</div>
 
 <div class="canvas-wrapper">
     <canvas #canvas

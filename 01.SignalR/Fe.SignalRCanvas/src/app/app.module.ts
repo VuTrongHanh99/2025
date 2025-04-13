@@ -1,9 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
-import { DesktopComponent } from './modules/desktop/desktop.component';
-import { TaskbarComponent } from './modules/taskbar/taskbar.component';
-import { WindowComponent } from './modules/window/window.component';
 import { AppRoutingModule } from './app-routing.module';
 import { SpinnerComponent } from './pages/components/spinner/spinner.component';
 import { TranslateModule } from '@ngx-translate/core';
@@ -18,9 +15,6 @@ import { ViewerComponent } from './modules/viewer/viewer.component';
 @NgModule({
   declarations: [
     AppComponent,
-    DesktopComponent,
-    TaskbarComponent,
-    WindowComponent,
     SpinnerComponent,
     HandwritingCanvasComponent,
     ScreenShareComponent,
