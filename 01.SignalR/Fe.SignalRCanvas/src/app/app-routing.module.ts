@@ -3,8 +3,13 @@ import { Routes, RouterModule } from '@angular/router';
 import { HandwritingCanvasComponent } from './modules/handwriting-canvas/handwriting-canvas.component';
 import { ScreenShareComponent } from './modules/screen-share/screen-share.component';
 import { ViewerComponent } from './modules/viewer/viewer.component';
+import { DrawingCanvasComponent } from './modules/drawing-canvas/drawing-canvas.component';
 
 export const routes: Routes = [
+  {
+    path: "drawingcanvas",
+    component: DrawingCanvasComponent,
+  },
   {
     path: "handwriting",
     component: HandwritingCanvasComponent,

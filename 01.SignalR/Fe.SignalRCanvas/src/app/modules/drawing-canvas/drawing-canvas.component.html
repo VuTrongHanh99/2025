@@ -1,0 +1,23 @@
+<div class="toolbar">
+    <input type="color"
+           [(ngModel)]="strokeColor" />
+    <input type="range"
+           min="1"
+           max="100"
+           [(ngModel)]="lineWidth" />
+    <button (click)="selectTool('pen')">Bút</button>
+    <button (click)="selectTool('eraser')">Tẩy</button>
+    <button (click)="selectTool('text')">Chữ</button>
+    <button (click)="selectTool('rect')">Chữ nhật</button>
+    <button (click)="selectTool('circle')">Tròn</button>
+    <button (click)="undo()">Undo</button>
+    <button (click)="redo()">Redo</button>
+</div>
+
+<canvas #canvas
+        width="800"
+        height="500"
+        (mousedown)="startDrawing($event)"
+        (mousemove)="draw($event)"
+        (mouseup)="stopDrawing($event)"
+        (contextmenu)="onRightClick($event)"></canvas>

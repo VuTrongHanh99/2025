@@ -11,6 +11,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { OcrService } from './services/ocr.service';
 import { ScreenShareComponent } from './modules/screen-share/screen-share.component';
 import { ViewerComponent } from './modules/viewer/viewer.component';
+import { DrawingCanvasComponent } from './modules/drawing-canvas/drawing-canvas.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { ViewerComponent } from './modules/viewer/viewer.component';
     HandwritingCanvasComponent,
     ScreenShareComponent,
     ViewerComponent,
+    DrawingCanvasComponent,
   ],
   imports: [
     BrowserModule,

@@ -11,6 +11,7 @@ export class HandwritingCanvasComponent implements OnInit, AfterViewInit {
   @ViewChild('canvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   private drawing = false;
+  private tool: string = 'pen';
   penColor: string = '#000000';
   penWidth: number = 2;
   resultText: string = '#000000';
@@ -32,6 +33,7 @@ export class HandwritingCanvasComponent implements OnInit, AfterViewInit {
       this.ctx.font = '30px Arial';
       this.ctx.fillStyle = 'blue';
       this.ctx.fillText('Xin chào Angular!', 50, 100);
+
       this.ctx.lineWidth = 2;
       this.ctx.lineCap = 'round';
       this.drawText(); // Vẽ mặc định khi load

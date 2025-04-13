@@ -1,0 +1,12 @@
+canvas {
+    border: 1px solid #ccc;
+    cursor: crosshair;
+    background: #fff;
+}
+
+.toolbar {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
