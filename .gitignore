@@ -9,6 +9,7 @@ bin/
 obj/
 .vs/
 .vscode/
+.angular
 wwwroot/
 # Compiled Java class files
 *.class
