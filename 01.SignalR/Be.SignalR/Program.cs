@@ -32,7 +32,8 @@ var app = builder.Build();
 // Use CORS policy
 app.UseCors("AllowAngularClient");
 //app.UseCors();
-app.MapHub<SignalHub>("/signalhub");
+app.MapHub<SignalHub>("/signal");
+app.MapHub<ScreenShareHub>("/screenShareHub");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

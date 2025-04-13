@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { SignalRService } from 'src/app/services/signalr.service';
+import { SignalingService } from 'src/app/services/signaling.service';
 
 @Component({
   selector: 'app-viewer',
@@ -13,14 +13,41 @@ export class ViewerComponent implements OnInit {
   private videoElement!: HTMLVideoElement;
   imageSrc: string = '';
   constructor(
-    private signalRService: SignalRService
-  ) { }
+    private signalingService: SignalingService
+  ) {
 
-  async ngOnInit() {
+  }
+
+  ngOnInit() {
+    this.videoElement = document.querySelector('video')!;
+    // this.signaling.startConnection();
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:4200/signalhub')
+      .withUrl('https://localhost:5001/signal')
       .withAutomaticReconnect()
       .build();
+    this.hubConnection.on('ReceiveSignal', async (user, signal) => {
+      const data = JSON.parse(signal);
+      if (data.type === 'offer') {
+        await this.peerConnection.setRemoteDescription(data);
+        const answer = await this.peerConnection.createAnswer();
+        await this.peerConnection.setLocalDescription(answer);
+        this.hubConnection.invoke('SendSignal', 'user2', JSON.stringify(answer));
+      } else if (data.type === 'answer') {
+        await this.peerConnection.setRemoteDescription(data);
+      } else if (data.candidate) {
+        await this.peerConnection.addIceCandidate(data);
+      }
+    });
+    this.hubConnection.start();
+
+
+    debugger
+    this.hubConnection.on('ReceiveSignal', (data) => {
+      const signal = JSON.parse(data);
+      // xử lý offer / answer / iceCandidate
+    });
+
+
 
     // this.hubConnection.on('ReceiveSignal', async (user, signal) => {
     //   const data = JSON.parse(signal);
@@ -35,27 +62,61 @@ export class ViewerComponent implements OnInit {
     //     await this.peerConnection.addIceCandidate(data);
     //   }
     // });
-
-
-    // this.hubConnection.on('ReceiveSignal', async (user, signal) => {
-    //   const data = JSON.parse(signal);
-    //   if (data.type === 'offer') {
-    //     await this.peerConnection.setRemoteDescription(data);
-    //     const answer = await this.peerConnection.createAnswer();
-    //     await this.peerConnection.setLocalDescription(answer);
-    //     this.hubConnection.invoke('SendSignal', 'user2', JSON.stringify(answer));
-    //   } else if (data.type === 'answer') {
-    //     await this.peerConnection.setRemoteDescription(data);
-    //   } else if (data.candidate) {
-    //     await this.peerConnection.addIceCandidate(data);
-    //   }
-    // });
-
     // this.signalRService.startConnection().then(() => {
     //   this.signalRService.onScreenReceived((image) => {
     //     this.imageSrc = image;
     //   });
     // });
   }
+  async connectToScreenShare() {
+    const peer = new RTCPeerConnection();
 
+    peer.ontrack = (event) => {
+      const stream = event.streams[0];
+      const videoElement = document.getElementById('remoteVideo') as HTMLVideoElement;
+      videoElement.srcObject = stream;
+    };
+
+    peer.onicecandidate = event => {
+      if (event.candidate) {
+        this.signalingService.sendCandidate(event.candidate, 'clientA');
+      }
+    };
+
+    this.signalingService.onOffer = async (offer) => {
+      await peer.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await peer.createAnswer();
+      await peer.setLocalDescription(answer);
+      this.signalingService.sendAnswer(answer, 'clientA');
+    };
+
+    this.signalingService.onCandidate = async (candidate) => {
+      await peer.addIceCandidate(new RTCIceCandidate(candidate));
+    };
+    //
+    //Old cũ
+    //
+    //Lấy stream(video + audio)
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: true // Để lấy luôn cả tiếng
+    });
+    this.videoElement.srcObject = stream;
+    //Tạo peer connection:
+    this.peerConnection = new RTCPeerConnection();
+    stream.getTracks().forEach(track => this.peerConnection.addTrack(track, stream));
+
+    this.peerConnection.onicecandidate = event => {
+      if (event.candidate) {
+        this.hubConnection.invoke('SendSignal', 'user1', JSON.stringify(event.candidate));
+      }
+    };
+
+    //Gửi offer qua SignalR:
+    const offer = await this.peerConnection.createOffer();
+    await this.peerConnection.setLocalDescription(offer);
+    this.hubConnection.invoke('SendSignal', 'user1', JSON.stringify(offer));
+
+
+  }
 }

@@ -9,7 +9,6 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TranslationService } from './_core/i18n/translation.service';
 import { SpinnerHandlerService } from './spinner-handler.service';
-import { SignalRService } from './services/signalr.service';
 
 @Component({
   selector: 'body[root]',

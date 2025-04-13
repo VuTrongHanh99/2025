@@ -12,6 +12,9 @@ import { OcrService } from './services/ocr.service';
 import { ScreenShareComponent } from './modules/screen-share/screen-share.component';
 import { ViewerComponent } from './modules/viewer/viewer.component';
 import { DrawingCanvasComponent } from './modules/drawing-canvas/drawing-canvas.component';
+import { ScreenShare2Component } from './modules/screen-share2/screen-share2.component';
+import { N2viewerComponent } from './modules/n2viewer/n2viewer.component';
+import { N2broadcasterComponent } from './modules/n2broadcaster/n2broadcaster.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +24,9 @@ import { DrawingCanvasComponent } from './modules/drawing-canvas/drawing-canvas.
     ScreenShareComponent,
     ViewerComponent,
     DrawingCanvasComponent,
+    ScreenShare2Component,
+    N2viewerComponent,
+    N2broadcasterComponent,
   ],
   imports: [
     BrowserModule,

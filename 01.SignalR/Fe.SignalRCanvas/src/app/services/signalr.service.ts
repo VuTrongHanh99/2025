@@ -1,63 +1,40 @@
+
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;
-  public onSignalReceived!: (user: string, signal: any) => void;
 
-  constructor() {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:5001/signalhub')// Thay bằng URL backend
-      .withAutomaticReconnect()
-      .build();
-
-    this.hubConnection.start().then(() => {
-      console.log('SignalR Connected.');
-    });
-
-    this.hubConnection.on('ReceiveSignal', (user, signalData) => {
-      if (this.onSignalReceived) {
-        this.onSignalReceived(user, signalData);
-      }
-    });
-  }
-
-  sendSignal(user: string, signalData: any) {
-    this.hubConnection.invoke('SendSignal', user, signalData);
-  }
-
-  // public startConnection() {
+  // public startConnection(): void {
   //   this.hubConnection = new signalR.HubConnectionBuilder()
-  //     .withUrl('http://localhost:4200/signalhub') // Thay bằng URL backend
+  //     .withUrl('https://localhost:5001/screenShareHub')
   //     .withAutomaticReconnect()
   //     .build();
 
-  //   return this.hubConnection.start();
+  //   this.hubConnection.start().catch(err => console.error('Error starting SignalR connection:', err));
   // }
+  async startConnection() {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) return;
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('https://localhost:5001/screenShareHub')
+      .withAutomaticReconnect()
+      .build();
 
-  // public sendScreenFrame(imageBase64: string) {
-  //   this.hubConnection.invoke('BroadcastScreen', imageBase64);
-  // }
+    try {
+      await this.hubConnection.start();
+      console.log('SignalR connected');
+    } catch (err) {
+      console.error('SignalR start error:', err);
+    }
+  }
 
-  // public onScreenReceived(callback: (image: string) => void) {
-  //   this.hubConnection.on('ReceiveScreen', callback);
-  // }
-  // public startConnection = () => {
-  //   this.hubConnection = new signalR.HubConnectionBuilder()
-  //     .withUrl('http://localhost:4200/chathub')
-  //     .build();
-  //   this.hubConnection
-  //     .start()
-  //     .then(() => console.log('Connection started'))
-  //     .catch(err => console.log('Error while starting connection: ' + err));
-  // }
 
-  // public addTransferChartDataListener = () => {
-  //   this.hubConnection.on('ReceiveMessage', (user, message) => {
-  //     console.log(user, message);
-  //   });
-  // }
+  on(method: string, callback: (...args: any[]) => void) {
+    this.hubConnection?.on(method, callback);
+  }
+
+  invoke(method: string, ...args: any[]) {
+    return this.hubConnection?.invoke(method, ...args);
+  }
 }

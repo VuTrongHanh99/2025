@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { SignalRService } from 'src/app/services/signalr.service';
+import { SignalingService } from 'src/app/services/signaling.service';
 
 @Component({
   selector: 'app-screen-share',
@@ -14,16 +14,16 @@ export class ScreenShareComponent implements OnInit {
 
 
   constructor(
-    // private signalRService: SignalRService
+    private signaling: SignalingService
   ) {
   }
   ngOnInit(): void {
     this.videoElement = document.querySelector('video')!;
+    // this.signaling.startConnection();
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:5001/signalhub')
+      .withUrl('https://localhost:5001/signal')
       .withAutomaticReconnect()
       .build();
-
     this.hubConnection.on('ReceiveSignal', async (user, signal) => {
       const data = JSON.parse(signal);
       if (data.type === 'offer') {
@@ -37,7 +37,6 @@ export class ScreenShareComponent implements OnInit {
         await this.peerConnection.addIceCandidate(data);
       }
     });
-
     this.hubConnection.start();
   }
 
@@ -55,6 +54,7 @@ export class ScreenShareComponent implements OnInit {
 
     this.peerConnection.onicecandidate = event => {
       if (event.candidate) {
+        // this.signaling.sendSignal(event.candidate, 'user1');
         this.hubConnection.invoke('SendSignal', 'user1', JSON.stringify(event.candidate));
       }
     };
@@ -62,6 +62,7 @@ export class ScreenShareComponent implements OnInit {
     //Gửi offer qua SignalR:
     const offer = await this.peerConnection.createOffer();
     await this.peerConnection.setLocalDescription(offer);
+    // this.signaling.sendOffer(offer, 'user1');
     this.hubConnection.invoke('SendSignal', 'user1', JSON.stringify(offer));
   }
 
