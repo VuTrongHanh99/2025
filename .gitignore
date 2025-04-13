@@ -8,6 +8,7 @@ dist/
 bin/
 obj/
 .vs/
+.vscode/
 wwwroot/
 # Compiled Java class files
 *.class
