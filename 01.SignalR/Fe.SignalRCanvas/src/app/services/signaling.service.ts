@@ -15,21 +15,6 @@ export class SignalingService {
       .withUrl('https://localhost:5001/signal')
       .withAutomaticReconnect()
       .build();
-
-    // this.hubConnection.on('ReceiveSignal', async (user, signal) => {
-    //   const data = JSON.parse(signal);
-    //   if (data.type === 'offer') {
-    //     await this.peerConnection.setRemoteDescription(data);
-    //     const answer = await this.peerConnection.createAnswer();
-    //     await this.peerConnection.setLocalDescription(answer);
-    //     this.hubConnection.invoke('SendSignal', 'user2', JSON.stringify(answer));
-    //   } else if (data.type === 'answer') {
-    //     await this.peerConnection.setRemoteDescription(data);
-    //   } else if (data.candidate) {
-    //     await this.peerConnection.addIceCandidate(data);
-    //   }
-    // });
-
     this.hubConnection.start().then(() => {
       console.log('SignalR connected');
       this.hubConnection.on('ReceiveOffer', this.onOffer);

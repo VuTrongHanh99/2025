@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { SignalingService } from 'src/app/services/signaling.service';
 
@@ -12,6 +12,8 @@ export class ViewerComponent implements OnInit {
   private peerConnection!: RTCPeerConnection;
   private videoElement!: HTMLVideoElement;
   imageSrc: string = '';
+  @ViewChild('remoteVideo', { static: true }) remoteVideoRef!: ElementRef;
+  remoteVideo!: HTMLVideoElement;
   constructor(
     private signalingService: SignalingService
   ) {
@@ -19,33 +21,77 @@ export class ViewerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.videoElement = document.querySelector('video')!;
-    // this.signaling.startConnection();
+    this.remoteVideo = this.remoteVideoRef.nativeElement;
+    this.peerConnection = new RTCPeerConnection();
+    // Nhận track từ người chia sẻ và phát lên video
+    const remoteStream = new MediaStream();
+    this.peerConnection.ontrack = (event) => {
+      remoteStream.addTrack(event.track);
+      this.remoteVideo.srcObject = remoteStream;
+    };
+    // Khi nhận ICE candidate
+    this.peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        this.hubConnection.invoke('SendSignal', 'user1', JSON.stringify(event.candidate));
+      }
+    };
+    // Kết nối SignalR
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('https://localhost:5001/signal')
       .withAutomaticReconnect()
       .build();
+
     this.hubConnection.on('ReceiveSignal', async (user, signal) => {
       const data = JSON.parse(signal);
+      // Khi nhận offer từ user1
       if (data.type === 'offer') {
-        await this.peerConnection.setRemoteDescription(data);
+        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(data));
+
         const answer = await this.peerConnection.createAnswer();
         await this.peerConnection.setLocalDescription(answer);
-        this.hubConnection.invoke('SendSignal', 'user2', JSON.stringify(answer));
-      } else if (data.type === 'answer') {
-        await this.peerConnection.setRemoteDescription(data);
-      } else if (data.candidate) {
-        await this.peerConnection.addIceCandidate(data);
+
+        this.hubConnection.invoke('SendSignal', 'user1', JSON.stringify(answer));
+      }
+      // Khi nhận ICE candidate
+      if (data.candidate) {
+        try {
+          await this.peerConnection.addIceCandidate(new RTCIceCandidate(data));
+        } catch (err) {
+          console.error('Error adding ICE candidate', err);
+        }
       }
     });
     this.hubConnection.start();
 
 
-    debugger
-    this.hubConnection.on('ReceiveSignal', (data) => {
-      const signal = JSON.parse(data);
-      // xử lý offer / answer / iceCandidate
-    });
+
+    // this.videoElement = document.querySelector('video')!;
+    // // this.signaling.startConnection();
+    // this.hubConnection = new signalR.HubConnectionBuilder()
+    //   .withUrl('https://localhost:5001/signal')
+    //   .withAutomaticReconnect()
+    //   .build();
+    // this.hubConnection.on('ReceiveSignal', async (user, signal) => {
+    //   const data = JSON.parse(signal);
+    //   if (data.type === 'offer') {
+    //     await this.peerConnection.setRemoteDescription(data);
+    //     const answer = await this.peerConnection.createAnswer();
+    //     await this.peerConnection.setLocalDescription(answer);
+    //     this.hubConnection.invoke('SendSignal', 'user2', JSON.stringify(answer));
+    //   } else if (data.type === 'answer') {
+    //     await this.peerConnection.setRemoteDescription(data);
+    //   } else if (data.candidate) {
+    //     await this.peerConnection.addIceCandidate(data);
+    //   }
+    // });
+    // this.hubConnection.start();
+
+
+    // debugger
+    // this.hubConnection.on('ReceiveSignal', (data) => {
+    //   const signal = JSON.parse(data);
+    //   // xử lý offer / answer / iceCandidate
+    // });
 
 
 

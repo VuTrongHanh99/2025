@@ -15,6 +15,7 @@ import { DrawingCanvasComponent } from './modules/drawing-canvas/drawing-canvas.
 import { ScreenShare2Component } from './modules/screen-share2/screen-share2.component';
 import { N2viewerComponent } from './modules/n2viewer/n2viewer.component';
 import { N2broadcasterComponent } from './modules/n2broadcaster/n2broadcaster.component';
+import { THomeComponent } from './modules/t-demo/t-home/t-home.component';
 
 @NgModule({
   declarations: [

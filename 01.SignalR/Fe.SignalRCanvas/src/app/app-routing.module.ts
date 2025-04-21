@@ -7,8 +7,15 @@ import { DrawingCanvasComponent } from './modules/drawing-canvas/drawing-canvas.
 import { ScreenShare2Component } from './modules/screen-share2/screen-share2.component';
 import { N2broadcasterComponent } from './modules/n2broadcaster/n2broadcaster.component';
 import { N2viewerComponent } from './modules/n2viewer/n2viewer.component';
+import { THomeComponent } from './modules/t-demo/t-home/t-home.component';
+import { TSenderComponent } from './modules/t-demo/t-sender/t-sender.component';
+import { TViewerComponent } from './modules/t-demo/t-viewer/t-viewer.component';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 't-home', pathMatch: 'full' },
+  { path: 't-home', component: THomeComponent },
+  { path: 't-sender', component: TSenderComponent },
+  { path: 't-viewer', component: TViewerComponent },
   {
     path: "drawingcanvas",
     component: DrawingCanvasComponent,
