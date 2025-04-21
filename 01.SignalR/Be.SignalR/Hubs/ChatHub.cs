@@ -3,6 +3,7 @@ namespace SignalR.Hubs
 {
     public class SignalHub : Hub
     {
+        #region t-signaling.service.ts
         private static string? _senderConnectionId;
         public async Task RegisterSender()
         {
@@ -45,7 +46,7 @@ namespace SignalR.Hubs
                 await Clients.Client(_senderConnectionId).SendAsync("ReceiveCandidateFromViewer", Context.ConnectionId, candidate);
             }
         }
-
+        #endregion
         //
         public async Task SendSignal(string user, string signalData)
         {

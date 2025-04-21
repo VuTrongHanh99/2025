@@ -7,6 +7,7 @@ namespace SignalR.Hubs
     {
         // Lưu mapping viewerId <-> ConnectionId
         private static ConcurrentDictionary<string, string> viewerConnections = new();
+        private static string? senderConnectionId;
 
         // Gán viewer ID (có thể dùng Guid hoặc ConnectionId)
         public async Task JoinAsViewer()
@@ -21,6 +22,7 @@ namespace SignalR.Hubs
             await Clients.Group("sender").SendAsync("ViewerJoined", viewerId);
         }
 
+        //Gỡ viewer khi mất kết nối là rất cần thiết.
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var viewer = viewerConnections.FirstOrDefault(x => x.Value == Context.ConnectionId);
@@ -35,7 +37,16 @@ namespace SignalR.Hubs
 
         public async Task RegisterAsSender()
         {
+            // Nếu đã có sender, thông báo sender cũ bị thay thế (optional)
+            if (!string.IsNullOrEmpty(senderConnectionId) && senderConnectionId != Context.ConnectionId)
+            {
+                await Clients.Client(senderConnectionId).SendAsync("SenderReplaced");
+            }
+            senderConnectionId = Context.ConnectionId;
             await Groups.AddToGroupAsync(Context.ConnectionId, "sender");
+
+            // Gửi danh sách viewers hiện tại (nếu cần)
+            await Clients.Client(Context.ConnectionId).SendAsync("ViewerList", viewerConnections.Keys);
         }
 
         public async Task SendOffer(string viewerId, object offer)

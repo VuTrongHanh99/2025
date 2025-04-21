@@ -17,6 +17,7 @@ export class TSignalingService {
     this.registerHubEvents();
     return this.hubConnection.start();
   }
+  //Đăng ký các sự kiện từ SignalR Hub để xử lý tương ứng theo luồng WebRTC signaling
   private registerHubEvents() {
     this.hubConnection.on('ReceiveViewer', async (viewerId: string) => {
       const pc = new RTCPeerConnection(this.rtcConfig);
