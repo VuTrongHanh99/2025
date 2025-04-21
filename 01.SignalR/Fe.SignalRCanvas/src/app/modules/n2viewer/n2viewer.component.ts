@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { SignalRService } from 'src/app/services/signalr.service';
 
 @Component({
@@ -7,49 +7,53 @@ import { SignalRService } from 'src/app/services/signalr.service';
   styleUrls: ['./n2viewer.component.scss']
 })
 export class N2viewerComponent {
-  @ViewChild('video') videoElement!: ElementRef<HTMLVideoElement>;
-  private peer!: RTCPeerConnection;
+  private pc!: RTCPeerConnection;
+  private viewerId!: string;
 
-  constructor(private signalR: SignalRService) {
-    this.init();
+  constructor(private signalR: SignalRService) { }
+
+  ngOnInit() {
+    this.signalR.startConnection().then((s) => {
+      this.signalR.viewerIdAssigned$.subscribe(id => {
+        this.viewerId = id;
+      });
+
+      this.signalR.offerReceived$.subscribe(({ viewerId, offer }) => {
+        this.handleOffer(offer);
+      });
+
+      this.signalR.iceCandidateReceived$.subscribe(({ viewerId, candidate }) => {
+        this.pc?.addIceCandidate(new RTCIceCandidate(candidate));
+      });
+      // CHỜ vài giây hoặc bắt event ready rồi mới gọi
+      setTimeout(() => {
+        this.signalR.joinAsViewer().then(s => {
+          console.log('Thông báo tham gia!');
+        }); // thông báo tham gia;
+      }, 500); // 👈 Tạm thời chờ nếu cần
+    });
   }
 
-  async init() {
-    await this.signalR.startConnection();
-    console.log('✅ Viewer connected to SignalR');
+  async handleOffer(offer: RTCSessionDescriptionInit) {
+    this.pc = new RTCPeerConnection();
 
-    this.signalR.on('ReceiveOffer', async (broadcasterId: string, offer: string) => {
-      console.log('📨 Received Offer from broadcaster:', broadcasterId);
+    this.pc.ontrack = (event) => {
+      const [stream] = event.streams;
+      const video = document.querySelector('video')!;
+      video.srcObject = stream;
+      console.log('Tham gia!');
+    };
 
-      this.peer = new RTCPeerConnection();
-
-      this.peer.onicecandidate = (event) => {
-        if (event.candidate) {
-          console.log('📤 Sending candidate to broadcaster');
-          this.signalR.invoke('SendCandidate', broadcasterId, JSON.stringify(event.candidate));
-        }
-      };
-
-      this.peer.ontrack = (event) => {
-        console.log('🎥 Received stream:', event.streams);
-        this.videoElement.nativeElement.srcObject = event.streams[0];
-      };
-
-      await this.peer.setRemoteDescription(new RTCSessionDescription(JSON.parse(offer)));
-      const answer = await this.peer.createAnswer();
-      await this.peer.setLocalDescription(answer);
-      await this.signalR.invoke('SendAnswer', broadcasterId, JSON.stringify(answer));
-    });
-
-    this.signalR.on('ReceiveCandidate', async (peerId: string, candidate: string) => {
-      if (this.peer) {
-        console.log('📥 Adding candidate:', candidate);
-        await this.peer.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)));
+    this.pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        this.signalR.sendIceCandidate(this.viewerId, event.candidate);
       }
-    });
+    };
 
-    // Gửi tín hiệu tham gia sau khi kết nối
-    await this.signalR.invoke('JoinAsViewer');
-    console.log('👋 Joined as viewer');
+    await this.pc.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await this.pc.createAnswer();
+    await this.pc.setLocalDescription(answer);
+
+    this.signalR.sendAnswer(this.viewerId, answer);
   }
 }

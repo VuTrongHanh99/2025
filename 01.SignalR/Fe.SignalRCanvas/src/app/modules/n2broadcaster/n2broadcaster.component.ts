@@ -7,44 +7,51 @@ import { SignalRService } from 'src/app/services/signalr.service';
   styleUrls: ['./n2broadcaster.component.scss']
 })
 export class N2broadcasterComponent {
-  screenStream!: MediaStream;
-  peerConnections: { [viewerId: string]: RTCPeerConnection } = {};
-  constructor(private signalR: SignalRService) {
+  private stream!: MediaStream;
+  private peerConnections: Map<string, RTCPeerConnection> = new Map();
+  constructor(private signalR: SignalRService) { }
+
+  ngOnInit() {
     this.signalR.startConnection();
 
-    this.signalR.on('ViewerId', async (viewerId: string) => {
-      const pc = this.createPeerConnection(viewerId);
-      this.screenStream.getTracks().forEach(track => pc.addTrack(track, this.screenStream));
-
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      this.signalR.invoke('SendOffer', viewerId, JSON.stringify(offer));
+    this.signalR.viewerJoined$.subscribe(viewerId => this.handleNewViewer(viewerId));
+    this.signalR.answerReceived$.subscribe(({ viewerId, answer }) => {
+      const pc = this.peerConnections.get(viewerId);
+      pc?.setRemoteDescription(new RTCSessionDescription(answer));
     });
 
-    this.signalR.on('ReceiveAnswer', async (viewerId: string, answer: string) => {
-      const pc = this.peerConnections[viewerId];
-      if (pc) await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(answer)));
+    this.signalR.iceCandidateReceived$.subscribe(({ viewerId, candidate }) => {
+      const pc = this.peerConnections.get(viewerId);
+      pc?.addIceCandidate(new RTCIceCandidate(candidate));
     });
 
-    this.signalR.on('ReceiveCandidate', async (viewerId: string, candidate: string) => {
-      const pc = this.peerConnections[viewerId];
-      if (pc) await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)));
+    this.signalR.viewerLeft$.subscribe(viewerId => {
+      const pc = this.peerConnections.get(viewerId);
+      pc?.close();
+      this.peerConnections.delete(viewerId);
     });
   }
-  async start() {
-    this.screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+
+  async startSharing() {
+    this.stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    const video = document.querySelector('video')!;
+    video.srcObject = this.stream;
   }
 
-  createPeerConnection(viewerId: string): RTCPeerConnection {
+  async handleNewViewer(viewerId: string) {
     const pc = new RTCPeerConnection();
-    this.peerConnections[viewerId] = pc;
+    this.peerConnections.set(viewerId, pc);
 
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        this.signalR.invoke('SendCandidate', viewerId, JSON.stringify(event.candidate));
+    this.stream.getTracks().forEach(track => pc.addTrack(track, this.stream));
+
+    pc.onicecandidate = (e) => {
+      if (e.candidate) {
+        this.signalR.sendIceCandidate(viewerId, e.candidate);
       }
     };
 
-    return pc;
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    this.signalR.sendOffer(viewerId, offer);
   }
 }
