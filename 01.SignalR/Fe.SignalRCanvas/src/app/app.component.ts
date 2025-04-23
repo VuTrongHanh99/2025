@@ -20,20 +20,20 @@ export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   spinnerActive: boolean = true;
   constructor(
-    private translationService: TranslationService,
+    // private translationService: TranslationService,
     public router: Router,
     public spinnerHandler: SpinnerHandlerService
   ) {
     this.spinnerHandler.showSpinner.subscribe(this.showSpinner.bind(this));
     // register translations
-    this.translationService.loadTranslations(
-      enLang,
-      chLang,
-      esLang,
-      jpLang,
-      deLang,
-      frLang
-    );
+    // this.translationService.loadTranslations(
+    //   enLang,
+    //   chLang,
+    //   esLang,
+    //   jpLang,
+    //   deLang,
+    //   frLang
+    // );
   }
   ngOnInit() {
     // this.signalRService.startConnection();

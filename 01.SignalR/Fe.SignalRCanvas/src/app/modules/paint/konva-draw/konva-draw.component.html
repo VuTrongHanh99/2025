@@ -1,0 +1,22 @@
+<div class="toolbar">
+    <button (click)="selectTool('pen')">✏️ Pen</button>
+    <button (click)="selectTool('rect')">⬛ Rect</button>
+    <button (click)="selectTool('circle')">⚪ Circle</button>
+    <button (click)="selectTool('text')">🔤 Text</button>
+    <button (click)="selectTool('eraser')">🧽 Eraser</button>
+    <input type="color"
+           [(ngModel)]="strokeColor" />
+    <select [(ngModel)]="fontFamily">
+        <option value="Arial">Arial</option>
+        <option value="Courier">Courier</option>
+        <option value="Times New Roman">Times New Roman</option>
+    </select>
+    <input type="number"
+           [(ngModel)]="fontSize"
+           min="8"
+           max="100" />
+    <button (click)="undo()">Undo</button>
+    <button (click)="redo()">Redo</button>
+</div>
+
+<div id="canvas-container"></div>

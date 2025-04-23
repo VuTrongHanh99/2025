@@ -1,0 +1,23 @@
+SELECT * FROM public."LmsQuiz";
+SELECT * FROM public."LmsSurveyQuestion";
+------------------------------------------------
+SELECT * FROM public."LmsStudentSurvey";
+SELECT * FROM public."LmsStudentQuiz";
+SELECT * FROM public."LmsStudentOther";
+--Xóa LMS
+delete from public."LmsSessionLearningRmDetail";
+delete from public."LmsLogLearningRmDetail";
+delete from public."LmsSessionDiscussionRmDetail";
+delete from public."LmsSessionDiscussion";
+delete from public."LmsStudentSurvey"; 
+delete from public."LmsStudentQuiz";
+delete from public."LmsStudentOther";
+delete from public."LmsSessionStudent";
+delete from public."LmsSessionClass";
+delete from public."LmsSession";
+
+delete from public."LmsQuiz";
+delete from public."LmsSurveyQuestion";
+delete from public."LmsRoadMapDetail";
+delete from public."LmsRoadMap";
+delete from public."LmsCourse";

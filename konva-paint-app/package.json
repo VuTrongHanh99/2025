@@ -1,0 +1,12 @@
+{
+  "name": "konva-paint-app",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "ng serve"
+  },
+  "dependencies": {
+    "@angular/core": "^14.0.0",
+    "konva": "^9.2.0",
+    "ngx-konva": "^9.0.0"
+  }
+}

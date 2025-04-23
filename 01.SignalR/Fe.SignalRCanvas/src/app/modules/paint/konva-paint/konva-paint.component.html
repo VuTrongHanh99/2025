@@ -1,0 +1,32 @@
+<div>
+    <label>Mode:
+        <select [(ngModel)]="mode">
+            <option value="draw">Draw</option>
+            <option value="rect">Rectangle</option>
+            <option value="circle">Circle</option>
+            <option value="text">Text</option>
+            <option value="erase">Erase</option>
+        </select>
+    </label>
+
+    <label>Color:
+        <input type="color"
+               [(ngModel)]="color">
+    </label>
+
+    <label>Width:
+        <input type="number"
+               [(ngModel)]="lineWidth"
+               min="1">
+    </label>
+
+    <button (click)="drawRect()">Draw Rect</button>
+    <button (click)="drawCircle()">Draw Circle</button>
+    <button (click)="addText()">Add Text</button>
+    <button (click)="undo()">Undo</button>
+    <button (click)="redo()">Redo</button>
+    <button (click)="exportImage()">Export PNG</button>
+</div>
+
+<div id="canvas-container"
+     style="border:1px solid #ccc; margin-top:10px;"></div>

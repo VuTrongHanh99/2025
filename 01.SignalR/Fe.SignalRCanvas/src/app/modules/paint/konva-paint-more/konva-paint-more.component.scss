@@ -1,0 +1,15 @@
+#canvas-container {
+    border: 1px solid black;
+    position: absolute;
+}
+
+.tools {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+button {
+    margin: 5px;
+}
