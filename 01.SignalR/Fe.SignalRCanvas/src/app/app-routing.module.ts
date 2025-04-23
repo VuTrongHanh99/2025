@@ -13,6 +13,7 @@ import { TViewerComponent } from './modules/t-demo/t-viewer/t-viewer.component';
 import { KonvaPaintComponent } from './modules/paint/konva-paint/konva-paint.component';
 import { KonvaPaintMoreComponent } from './modules/paint/konva-paint-more/konva-paint-more.component';
 import { KonvaDrawComponent } from './modules/paint/konva-draw/konva-draw.component';
+import { KonvaDrawAllComponent } from './modules/paint/konva-draw-all/konva-draw-all.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 't-home', pathMatch: 'full' },
@@ -60,6 +61,10 @@ export const routes: Routes = [
   {
     path: "konva-draw",
     component: KonvaDrawComponent,
+  },
+  {
+    path: "konva-draw-all",
+    component: KonvaDrawAllComponent,
   },
   { path: '**', redirectTo: 'error/404' },
 ];

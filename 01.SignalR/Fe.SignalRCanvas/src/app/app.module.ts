@@ -6,7 +6,7 @@ import { SpinnerComponent } from './pages/components/spinner/spinner.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { HandwritingCanvasComponent } from './modules/draw-canvas/handwriting-canvas/handwriting-canvas.component';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { OcrService } from './services/ocr.service';
 import { ScreenShareComponent } from './modules/share-screen/screen-share/screen-share.component';
@@ -19,6 +19,7 @@ import { KonvaPaintComponent } from './modules/paint/konva-paint/konva-paint.com
 import { NgxKonvaModule } from 'ngx-konva';
 import { KonvaPaintMoreComponent } from './modules/paint/konva-paint-more/konva-paint-more.component';
 import { KonvaDrawComponent } from './modules/paint/konva-draw/konva-draw.component';
+import { KonvaDrawAllComponent } from './modules/paint/konva-draw-all/konva-draw-all.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { KonvaDrawComponent } from './modules/paint/konva-draw/konva-draw.compon
     KonvaPaintComponent,
     KonvaPaintMoreComponent,
     KonvaDrawComponent,
+    KonvaDrawAllComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,6 +44,7 @@ import { KonvaDrawComponent } from './modules/paint/konva-draw/konva-draw.compon
     HttpClientModule,
     AppRoutingModule,
     NgxKonvaModule,
+    ReactiveFormsModule,
     TranslateModule.forRoot(),
   ],
   providers: [

@@ -11,15 +11,14 @@ export class KonvaPaintMoreComponent {
   strokeColor = '#000';
   fontSize = 24;
   fontFamily = 'Arial';
+
   stage!: Konva.Stage;
   layer!: Konva.Layer;
   drawing: boolean = false;
   currentShape: string = 'freeDraw';
   shapes: Konva.Shape[] = [];
-  undoStack: Konva.Shape[][] = [];
+  history: any[] = [];
   redoStack: Konva.Shape[][] = [];
-
-  stageConfig = { width: 800, height: 600 };
 
   constructor() { }
 
@@ -39,50 +38,55 @@ export class KonvaPaintMoreComponent {
     this.addEventListeners();
   }
   addEventListeners() {
+    let lastLine: Konva.Line;
     this.stage.on('mousedown touchstart', (e) => {
       if (this.currentShape === 'freeDraw') {
         this.drawing = true;
         const pos = this.stage.getPointerPosition();
-        if (pos == null)
-          return;
-        const line = new Konva.Line({
-          stroke: 'black',
-          strokeWidth: 5,
+        if (pos == null) return;
+        lastLine = new Konva.Line({
           points: [pos.x, pos.y],
+          stroke: this.strokeColor,
+          strokeWidth: 5,
           lineCap: 'round',
           lineJoin: 'round',
         });
-        this.layer.add(line);
-        this.shapes.push(line);
+        this.layer.add(lastLine);
+        this.shapes.push(lastLine);
       }
-    });
-
-    this.stage.on('mousemove touchmove', (e) => {
-      if (!this.drawing) return;
-      const pos = this.stage.getPointerPosition();
-      if (pos == null)
-        return;
-      const line = this.shapes[this.shapes.length - 1] as Konva.Line;
-      line.points(line.points().concat([pos.x, pos.y]));
-      this.layer.batchDraw();
     });
 
     this.stage.on('mouseup touchend', () => {
       this.drawing = false;
       this.saveState();
     });
+
+    this.stage.on('mousemove touchmove', (e) => {
+      if (!this.drawing || !lastLine) return;
+      const pos = this.stage.getPointerPosition();
+      if (pos == null) return;
+      const newPoints = lastLine.points().concat([pos.x, pos.y]);
+      lastLine.points(newPoints);
+      this.layer.batchDraw();
+      // const pos = this.stage.getPointerPosition();
+      // if (pos == null)
+      //   return;
+      // const line = this.shapes[this.shapes.length - 1] as Konva.Line;
+      // line.points(line.points().concat([pos.x, pos.y]));
+      // this.layer.batchDraw();
+    });
   }
 
   saveState() {
     // Clone các đối tượng của layer để tránh việc thay đổi sau này
     const state = this.layer.getChildren().map(node => node.clone());
-    this.undoStack.push(state);
+    this.history.push(state);
     this.redoStack = []; // Clear redo stack after a new action
   }
 
   undo() {
-    if (this.undoStack.length > 0) {
-      const lastState = this.undoStack.pop() as Shape<ShapeConfig>[];
+    if (this.history.length > 0) {
+      const lastState = this.history.pop() as Shape<ShapeConfig>[];
       this.redoStack.push(lastState);
       this.layer.removeChildren();
       this.layer.add(...lastState);
@@ -93,7 +97,7 @@ export class KonvaPaintMoreComponent {
   redo() {
     if (this.redoStack.length > 0) {
       const lastState = this.redoStack.pop() as Shape<ShapeConfig>[];
-      this.undoStack.push(lastState);
+      this.history.push(lastState);
       this.layer.removeChildren();
       this.layer.add(...lastState);
       this.layer.batchDraw();

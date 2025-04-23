@@ -1,0 +1,35 @@
+<div class="toolbar">
+       <button (click)="selectTool('select')">Select</button>
+       <input type="color"
+              [(ngModel)]="bgColor">
+       <button (click)="selectTool('freeDraw')">Free Draw</button>
+       <select [(ngModel)]="shapeType">
+              <option value="rect">Rectangle</option>
+              <option value="circle">Circle</option>
+              <option value="line">Line</option>
+              <option value="triangle">Triangle</option>
+       </select>
+       <button (click)="addShape()">Add Shape</button>
+       <button (click)="selectTool('text')">Add Text</button>
+       <ng-container *ngIf="activeTool === 'text'">
+              <input [(ngModel)]="textOptions.text"
+                     placeholder="Text...">
+              <input type="color"
+                     [(ngModel)]="textOptions.fill">
+              <input type="number"
+                     [(ngModel)]="textOptions.fontSize"
+                     min="8">
+              <input [(ngModel)]="textOptions.fontFamily"
+                     placeholder="Font family">
+              <button (click)="addText()">OK</button>
+       </ng-container>
+       <button (click)="selectTool('eraser')">Eraser</button>
+       <button (click)="undo()">Undo</button>
+       <button (click)="redo()">Redo</button>
+       <button (click)="deleteSelected()">Delete</button>
+       <button (click)="saveImage()">Save</button>
+</div>
+<ko-stage #stageComp
+          [config]="stageConfig">
+       <ko-layer></ko-layer>
+</ko-stage>
